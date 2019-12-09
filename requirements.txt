@@ -1,2 +1,4 @@
+pytz
+icalendar
 aiomisc
 aiohttp

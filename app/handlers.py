@@ -5,6 +5,8 @@ from aiohttp import ClientSession
 from aiohttp.web import View
 from aiohttp.web_response import Response
 
+from app.calendar_creator import create_calendar
+
 
 @lru_cache()
 def get_dates():
@@ -23,7 +25,7 @@ class CalendarView(View):
         date_start, date_end = get_dates()
         async with ClientSession() as client:
             async with client.get(
-                    f'http://ruz.fa.ru/api/schedule/{type}/{id}.ics?start={date_start}&finish={date_end}&lng=1') as rasp:
-                status = rasp.status
-                text = await rasp.text(encoding='utf-8')
-        return Response(text=text, content_type=rasp.content_type, status=status)
+                    f'http://ruz.fa.ru/api/schedule/{type}/{id}?start={date_start}&finish={date_end}&lng=1') as request:
+                pairs_list = await request.json()
+        calendar = create_calendar(pairs_list)
+        return Response(body=calendar, content_type='text/calendar', charset='utf-8')
