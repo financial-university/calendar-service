@@ -10,7 +10,7 @@ DATE_FORMAT = '%Y.%m.%d'
 def create_calendar(rasp: list):
     cal = Calendar()
     cal['version'] = '2.0'
-    cal['prodid'] = '-//FU calendar//FU calendar 1.0//RU'
+    cal['prodid'] = '-//FU_calendar//FU calendar 1.0//RU'
     cal['method'] = 'PUBLISH'
     cal['x-wr-calname'] = 'Расписание Университета'
     cal['x-wr-timezone'] = 'Europe/Moscow'
@@ -27,7 +27,7 @@ def create_calendar(rasp: list):
         event.add('dtstamp', date_stamp)
         event.add('location', f"{pair['auditorium'].split('/')[-1]}, {pair['building']}")
         event.add('description',
-                  f"{pair['kindOfWork']}\nПреподователь {pair['lecturer']}\nГруппы: {pair['group'] or pair['stream']}")
+                  f"{pair['kindOfWork']}\nПреподователь: {pair['lecturer']}\nГруппы: {pair['group'] or pair['stream']}")
         event.add('uid',
                   f'{hashlib.md5((pair["date"] + pair["beginLesson"]).encode()).hexdigest()}__fu_schedule')
         cal.add_component(event)

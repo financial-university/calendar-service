@@ -1,2 +1,4 @@
 .idea
 __pycache__/
+ics_folder
+!ics_folder/.gitkeep
