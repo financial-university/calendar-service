@@ -3,7 +3,7 @@ from os import getenv, getcwd, path
 from aiomisc import entrypoint
 
 from app.dependency import config_dependency
-from app.services import CalendarService
+from app.services import CalendarService, CalendarUpdater
 
 config = dict(
     db_host=getenv('DB_HOST') or 'localhost',
@@ -18,6 +18,7 @@ config = dict(
 if __name__ == '__main__':
     config_dependency(config)
     with entrypoint(
-            CalendarService(address='localhost', port=4040)
+            CalendarService(address='localhost', port=4040),
+            CalendarUpdater(interval=60 * 60 * 4)
     ) as loop:
         loop.run_forever()

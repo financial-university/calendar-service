@@ -1,6 +1,7 @@
 aiomysql
+aiomisc
+aiohttp
+alembic
 sqlalchemy
 pytz
 icalendar
-aiomisc
-aiohttp
