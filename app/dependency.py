@@ -17,7 +17,3 @@ def config_dependency(config):
         yield engine.acquire
         engine.close()
         await engine.wait_closed()
-
-    @dependency
-    async def ics_folder() -> str:
-        yield config['ics_folder']

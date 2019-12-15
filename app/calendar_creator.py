@@ -33,6 +33,8 @@ def create_calendar(rasp: list):
     date_stamp = datetime.now()
 
     for pair in rasp:
+        if pair['discipline'] == 'Военная подготовка':
+            continue
         event = Event()
         event.add('summary', pair['discipline'])
         date = datetime.strptime(pair['date'], DATE_FORMAT)
