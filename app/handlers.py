@@ -25,15 +25,16 @@ class BaseView(View):
 class CalendarView(BaseView):
     async def get(self):
         type = self.request.match_info['type']
-        id = self.request.match_info['id']
+        id = int(self.request.match_info['id'])
         async with self.db() as conn:
             result = await conn.execute(CalendarFile.find_file(id, type))
-            if not result.rowcount:
+            res = await result.fetchone()
+            if not res:
                 try:
                     calendar = await download_calendar(id, type)
                 except EmptySchedule:
                     raise HTTPNotFound()
-                self.request.app._loop.create_task(conn.execute(CalendarFile.add_file(id, type)))
+                await conn.execute(CalendarFile.add_file(id, type))
                 async with async_open(path.join(self.ics_folder, f'{type}_{id}.ics'), 'wb') as file:
                     await file.write(calendar)
             else:

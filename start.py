@@ -3,7 +3,7 @@ from os import getenv, getcwd, path
 from aiomisc import entrypoint
 
 from app.dependency import config_dependency
-from app.services import CalendarService, CalendarUpdater, RuzGrabber
+from app.services import CalendarService, CalendarUpdater, RuzGrabber, Koctil
 
 config = dict(
     db_host=getenv('DB_HOST') or 'localhost',
@@ -21,6 +21,7 @@ if __name__ == '__main__':
     with entrypoint(
             CalendarService(address='localhost', port=4040, ics_folder=config['ics_folder']),
             CalendarUpdater(interval=60 * 60 * 4, ics_folder=config['ics_folder']),
-            RuzGrabber(interval=60 * 60 * 24, files_folder=config['files_folder'])
+            RuzGrabber(interval=60 * 60 * 24, files_folder=config['files_folder']),
+            Koctil(interval=60 * 20)
     ) as loop:
         loop.run_forever()

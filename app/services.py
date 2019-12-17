@@ -8,6 +8,7 @@ from aiohttp.web import Application, view
 from aiomisc.io import async_open
 from aiomisc.service.aiohttp import AIOHTTPService
 from aiomisc.service.periodic import PeriodicService
+import sqlalchemy as sa
 import ujson
 
 from app.calendar_creator import download_calendar, EmptySchedule
@@ -88,3 +89,18 @@ class RuzGrabber(PeriodicService):
             async with async_open(path.join(self.files_folder, 'lecturers.json'), 'w') as file:
                 await file.write(ujson.dumps(lecturers))
             log.info('json files updated')
+
+
+class Koctil(PeriodicService):
+    """
+    Обращения к базе раз в двадцать минут
+    Вдруг поможет
+    Лел 🙃
+    """
+    __dependencies__ = ("db_write",)
+
+    db_write: connection
+
+    async def callback(self):
+        async with self.db_write() as conn:
+            await conn.scalar(sa.select([1]))
