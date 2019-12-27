@@ -1,10 +1,6 @@
 ujson
 marshmallow
-aiomysql
 aiomisc
-aiomisc_dependency
 aiohttp
-alembic
-sqlalchemy
 pytz
 icalendar
