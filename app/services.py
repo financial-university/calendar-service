@@ -21,9 +21,9 @@ class CalendarService(AIOHTTPService):
     async def create_application(self) -> Application:
         app = Application()
         app["ics_folder"] = self.ics_folder
-        app.add_routes([
-            view(r"/calendar/{type:(group|lecturer)}/{id:\d+}", CalendarView),
-        ])
+        app.add_routes(
+            [view(r"/calendar/{type:(group|lecturer)}/{id:\d+}", CalendarView),]
+        )
 
         return app
 
@@ -36,24 +36,28 @@ class RuzGrabber(PeriodicService):
 
     @staticmethod
     async def get_from_api(client, type: str):
-        groups = await client.get(f'https://ruz.fa.ru/api/dictionary/{type}')
+        groups = await client.get(f"https://ruz.fa.ru/api/dictionary/{type}")
         return await groups.json()
 
     async def callback(self):
         async with ClientSession() as client:
-            groups = await self.get_from_api(client, 'groups')
+            groups = await self.get_from_api(client, "groups")
             if not groups:
                 await sleep(1)
-                groups = await self.get_from_api(client, 'groups')
+                groups = await self.get_from_api(client, "groups")
             groups = self.GROUPS_LIST.load(groups)
-            async with async_open(path.join(self.files_folder, 'groups.json'), 'w') as file:
+            async with async_open(
+                path.join(self.files_folder, "groups.json"), "w"
+            ) as file:
                 await file.write(ujson.dumps(groups))
 
-            lecturers = await self.get_from_api(client, 'lecturers')
+            lecturers = await self.get_from_api(client, "lecturers")
             if not lecturers:
                 await sleep(1)
-                lecturers = await self.get_from_api(client, 'lecturers')
+                lecturers = await self.get_from_api(client, "lecturers")
             lecturers = self.LECTURERS_LIST.load(lecturers)
-            async with async_open(path.join(self.files_folder, 'lecturers.json'), 'w') as file:
+            async with async_open(
+                path.join(self.files_folder, "lecturers.json"), "w"
+            ) as file:
                 await file.write(ujson.dumps(lecturers))
-            log.info('json files updated')
+            log.info("json files updated")
