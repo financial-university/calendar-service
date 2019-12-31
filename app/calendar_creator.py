@@ -3,7 +3,7 @@ from datetime import datetime
 from functools import lru_cache
 
 import pytz
-from aiohttp import ClientSession, ClientTimeout, ContentTypeError
+from aiohttp import ClientSession, ClientError
 from icalendar import Calendar, Event
 
 DATE_FORMAT = "%Y.%m.%d"
@@ -95,6 +95,6 @@ async def download_calendar(id: int, type: str):
                 pairs_list = await request.json()
                 if not pairs_list:
                     raise EmptySchedule()
-        except (ClientTimeout, ContentTypeError):
+        except ClientError:
             raise ServiceUnavailable()
     return create_calendar(pairs_list)

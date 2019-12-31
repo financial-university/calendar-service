@@ -1,6 +1,7 @@
-ujson
-marshmallow
-aiomisc
 aiohttp
-pytz
+aiomisc
+aiomisc_dependency
 icalendar
+marshmallow
+pytz
+ujson

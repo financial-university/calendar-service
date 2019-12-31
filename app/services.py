@@ -22,7 +22,9 @@ class CalendarService(AIOHTTPService):
         app = Application()
         app["ics_folder"] = self.ics_folder
         app.add_routes(
-            [view(r"/calendar/{type:(group|lecturer)}/{id:\d+}", CalendarView),]
+            [
+                view(r"/calendar/{type:(group|lecturer)}/{id:\d+}{f:(.ics)?}", CalendarView),
+            ]
         )
 
         return app
