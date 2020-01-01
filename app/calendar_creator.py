@@ -4,7 +4,7 @@ from functools import lru_cache
 
 import pytz
 from aiohttp import ClientSession, ClientError
-from icalendar import Calendar, Event
+from icalendar import Calendar, Event, Timezone, TimezoneStandard
 
 DATE_FORMAT = "%Y.%m.%d"
 
@@ -17,14 +17,13 @@ class ServiceUnavailable(Exception):
     pass
 
 
-@lru_cache()
 def get_dates():
     now = datetime.now()
     format = "%Y.%m.%d"
     if now.month < 8:
         return (
-            datetime(now.year, 1, 15).strftime(format),
-            datetime(now.year, 6, 31).strftime(format),
+            datetime(now.year, 1, 8).strftime(format),
+            datetime(now.year, 6, 30).strftime(format),
         )
     else:
         return (
@@ -40,6 +39,17 @@ def create_calendar(rasp: list):
     cal["method"] = "PUBLISH"
     cal["x-wr-calname"] = "Расписание Университета"
     cal["x-wr-timezone"] = "Europe/Moscow"
+
+    tz = Timezone()
+    tz['TZID'] = 'Europe/Moscow'
+    cal.add_component(tz)
+
+    tzs = TimezoneStandard()
+    tzs['DTSTART'] = '16010101T000000'
+    tzs['TZOFFSETFROM'] = '+0300'
+    tzs['TZOFFSETTO'] = '+0300'
+    cal.add_component(tzs)
+
     date_stamp = datetime.now()
 
     for pair in rasp:
