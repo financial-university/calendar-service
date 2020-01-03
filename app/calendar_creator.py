@@ -1,6 +1,5 @@
 import hashlib
 from datetime import datetime
-from functools import lru_cache
 
 from aiohttp import ClientSession, ClientError
 from icalendar import Calendar, Event, Timezone, TimezoneStandard
@@ -23,11 +22,10 @@ class ServiceUnavailable(Exception):
 
 def get_dates():
     now = datetime.now()
-    format = "%Y.%m.%d"
     if now.month < 8:
         return (
-            datetime(now.year, 1, 8).strftime(format),
-            datetime(now.year, 6, 30).strftime(format),
+            datetime(now.year, 1, 8).strftime(DATE_FORMAT),
+            datetime(now.year, 6, 30).strftime(DATE_FORMAT),
         )
     else:
         return (
@@ -36,24 +34,31 @@ def get_dates():
         )
 
 
-def create_calendar(rasp: list):
+def create_calendar(rasp: list, url: str = ""):
     cal = Calendar()
     cal["version"] = "2.0"
     cal["prodid"] = "-//FU_calendar//FU calendar 1.0//RU"
     cal["method"] = "PUBLISH"
     cal["color"] = "teal"
+    cal["url"] = url
+
     cal["x-wr-calname"] = "Расписание Университета"
+    cal["DESCRIPTION"] = "Расписание Финансового Университета schedule.fa.ru"
+    cal["X-WR-CALDESC"] = "Расписание Финансового Университета schedule.fa.ru"
     cal["x-wr-timezone"] = "Europe/Moscow"
+    cal["TIMEZONE-ID"] = "Europe/Moscow"
+    cal["X-PUBLISHED-TTL"] = "PT4H"
+    cal.add("REFRESH-INTERVAL;VALUE=DURATION", "PT4H")
 
     tz = Timezone()
     tz["TZID"] = "Europe/Moscow"
-    cal.add_component(tz)
 
     tzs = TimezoneStandard()
     tzs["DTSTART"] = "16010101T000000"
     tzs["TZOFFSETFROM"] = "+0300"
     tzs["TZOFFSETTO"] = "+0300"
-    cal.add_component(tzs)
+    tz.add_component(tzs)
+    cal.add_component(tz)
 
     date_stamp = datetime.now()
 
@@ -114,4 +119,4 @@ async def download_calendar(id: int, type: str):
                 #     raise EmptySchedule()
         except ClientError:
             raise ServiceUnavailable()
-    return create_calendar(pairs_list)
+    return create_calendar(pairs_list, f"https://schedule.fa.ru/calendar/{type}/{id}")
