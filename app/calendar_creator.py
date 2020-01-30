@@ -66,7 +66,7 @@ def create_calendar(rasp: list, url: str = "", exclude: set = None):
     date_stamp = datetime.now()
 
     for pair in rasp:
-        if pair["disciplineOid"] in exclude:
+        if str(pair["disciplineOid"]) in exclude:
             continue
         pair = PAIR_SCHEMA.load(pair)
         event = Event()

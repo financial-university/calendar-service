@@ -19,8 +19,12 @@ class BaseView(View):
 
 
 def params_handler(query: MultiDict):
-    params = {k: set(v.split(";")) for k, v in query.items()}
-    params_string = "&".join(f"{k}={';'.join(sorted(v))}" for k, v in params.items())
+    try:
+        params = {k: set(v.split(";")) for k, v in query.items()}
+        params_string = "&".join(f"{k}={';'.join(sorted(v))}" for k, v in params.items())
+    except Exception:
+        params = {}
+        params_string = ""
     return params_string, params
 
 
@@ -34,9 +38,9 @@ class CalendarView(BaseView):
 
         file_path = path.join(self.ics_folder, f"{type}_{id}{params_string}.ics")
         if (
-            path.exists(file_path)
-            and datetime.fromtimestamp(stat(file_path).st_atime) + timedelta(hours=4)
-            > datetime.now()
+                path.exists(file_path)
+                and datetime.fromtimestamp(stat(file_path).st_atime) + timedelta(hours=4)
+                > datetime.now()
         ):
             async with async_open(file_path, "rb") as file:
                 calendar = await file.read()
