@@ -5,6 +5,7 @@ from os import path, stat
 from aiomisc.io import async_open
 from aiohttp.web import View, HTTPNotFound, HTTPServiceUnavailable
 from aiohttp.web_response import Response
+from multidict import MultiDict
 
 from app.calendar_creator import download_calendar, EmptySchedule, ServiceUnavailable
 
@@ -17,11 +18,21 @@ class BaseView(View):
         return self.request.app["ics_folder"]
 
 
+def params_handler(query: MultiDict):
+    params = {k: set(v.split(";")) for k, v in query.items()}
+    params_string = "&".join(f"{k}={';'.join(sorted(v))}" for k, v in params.items())
+    return params_string, params
+
+
 class CalendarView(BaseView):
     async def get(self):
         type = self.request.match_info["type"]
         id = int(self.request.match_info["id"])
-        file_path = path.join(self.ics_folder, f"{type}_{id}.ics")
+        params_string, params = params_handler(self.request.rel_url.query)
+        if params_string:
+            params_string = "_" + params_string
+
+        file_path = path.join(self.ics_folder, f"{type}_{id}{params_string}.ics")
         if (
             path.exists(file_path)
             and datetime.fromtimestamp(stat(file_path).st_atime) + timedelta(hours=4)
@@ -31,7 +42,7 @@ class CalendarView(BaseView):
                 calendar = await file.read()
         else:
             try:
-                calendar = await download_calendar(id, type)
+                calendar = await download_calendar(id, type, params)
                 async with async_open(file_path, "wb") as file:
                     await file.write(calendar)
             except EmptySchedule:

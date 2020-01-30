@@ -3,5 +3,6 @@ aiomisc
 aiomisc_dependency
 icalendar
 marshmallow
+multidict
 pytz
 ujson

@@ -1,5 +1,6 @@
 import hashlib
 from datetime import datetime
+from typing import Dict, Set
 
 from aiohttp import ClientSession, ClientError
 from icalendar import Calendar, Event, Timezone, TimezoneStandard
@@ -34,7 +35,9 @@ def get_dates():
         )
 
 
-def create_calendar(rasp: list, url: str = ""):
+def create_calendar(rasp: list, url: str = "", exclude: set = None):
+    if exclude is None:
+        exclude = set()
     cal = Calendar()
     cal["version"] = "2.0"
     cal["prodid"] = "-//FU_calendar//FU calendar 1.0//RU"
@@ -63,7 +66,7 @@ def create_calendar(rasp: list, url: str = ""):
     date_stamp = datetime.now()
 
     for pair in rasp:
-        if pair["discipline"] == "Военная подготовка":
+        if pair["disciplineOid"] in exclude:
             continue
         pair = PAIR_SCHEMA.load(pair)
         event = Event()
@@ -96,7 +99,7 @@ def create_calendar(rasp: list, url: str = ""):
         note = f'Примечание: {pair["note"]}' if pair["note"] else ""
         event.add(
             "description",
-            f"{pair['type']}\nПреподователь: {pair['teachers_name']}\nГруппы: {pair['groups']}\n{note}",
+            f"{pair['type']}\nПреподаватель: {pair['teachers_name']}\nГруппы: {pair['groups']}\n{note}",
         )
         event.add(
             "uid",
@@ -107,7 +110,7 @@ def create_calendar(rasp: list, url: str = ""):
     return cal.to_ical()
 
 
-async def download_calendar(id: int, type: str):
+async def download_calendar(id: int, type: str, params: Dict[str, Set[str]]):
     date_start, date_end = get_dates()
     async with ClientSession() as client:
         try:
@@ -119,4 +122,7 @@ async def download_calendar(id: int, type: str):
                 #     raise EmptySchedule()
         except ClientError:
             raise ServiceUnavailable()
-    return create_calendar(pairs_list, f"https://schedule.fa.ru/calendar/{type}/{id}")
+    exclude = params.get("ex", set())
+    return create_calendar(
+        pairs_list, f"https://schedule.fa.ru/calendar/{type}/{id}", exclude
+    )
