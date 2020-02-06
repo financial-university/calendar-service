@@ -1,13 +1,17 @@
 import hashlib
+import logging
 from datetime import datetime
-from typing import Dict, Set
+from typing import Dict, List
 
 from aiohttp import ClientSession, ClientError
 from icalendar import Calendar, Event, Timezone, TimezoneStandard
 import pytz
+from marshmallow import ValidationError
 from ujson import loads
 
 from app.schemas import Pair
+
+log = logging.getLogger(__name__)
 
 DATE_FORMAT = "%Y.%m.%d"
 PAIR_SCHEMA = Pair()
@@ -35,9 +39,15 @@ def get_dates():
         )
 
 
-def create_calendar(rasp: list, url: str = "", exclude: set = None):
+def create_calendar(
+    rasp: list, url: str = "", exclude: set = None, include_sub: dict = None
+):
+    if include_sub is None:
+        include_sub = {}
     if exclude is None:
         exclude = set()
+    exclude.update(include_sub.keys())
+
     cal = Calendar()
     cal["version"] = "2.0"
     cal["prodid"] = "-//FU_calendar//FU calendar 1.0//RU"
@@ -66,9 +76,16 @@ def create_calendar(rasp: list, url: str = "", exclude: set = None):
     date_stamp = datetime.now()
 
     for pair in rasp:
-        if str(pair["disciplineOid"]) in exclude:
+        if str(pair["disciplineOid"]) in exclude and include_sub.get(
+            str(pair["disciplineOid"]), 0
+        ) != str(pair["streamOid"]):
             continue
-        pair = PAIR_SCHEMA.load(pair)
+
+        try:
+            pair = PAIR_SCHEMA.load(pair)
+        except ValidationError:
+            log.warning("Error in validation calendar %s %r", url, pair)
+            continue
         event = Event()
         event.add("summary", pair["name"])
         date = pair["date"]
@@ -110,19 +127,28 @@ def create_calendar(rasp: list, url: str = "", exclude: set = None):
     return cal.to_ical()
 
 
-async def download_calendar(id: int, type: str, params: Dict[str, Set[str]]):
+def include_sub_handler(s: list):
+    try:
+        return dict(i.split("~") for i in s)
+    except ValueError:
+        return {}
+
+
+async def download_calendar(id: int, type: str, params: Dict[str, List[str]]):
     date_start, date_end = get_dates()
     async with ClientSession() as client:
         try:
             async with client.get(
-                f"http://ruz.fa.ru/api/schedule/{type}/{id}?start={date_start}&finish={date_end}&lng=1"
+                f"http://ruz.fa.ru/api/schedule/{type}/{id}?start={date_start}&finish={date_end}&lng=1",
+                timeout=20,
             ) as request:
                 pairs_list = await request.json(loads=loads)
                 # if not pairs_list:
                 #     raise EmptySchedule()
         except ClientError:
             raise ServiceUnavailable()
-    exclude = params.get("ex", set())
+    exclude = set(params["ex"]) if "ex" in params else set()
+    include_sub = include_sub_handler(params.get("in_sub", ""))
     return create_calendar(
-        pairs_list, f"https://schedule.fa.ru/calendar/{type}/{id}", exclude
+        pairs_list, f"https://schedule.fa.ru/calendar/{type}/{id}", exclude, include_sub
     )
