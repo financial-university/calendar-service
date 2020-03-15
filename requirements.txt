@@ -1,6 +1,7 @@
 aiohttp
 aiomisc
 aiomisc_dependency
+aioredis
 icalendar
 marshmallow
 multidict

@@ -2,6 +2,7 @@ import logging
 from asyncio import sleep
 from os import path
 
+import aioredis
 from aiohttp import ClientSession
 from aiohttp.web import Application, view
 from aiomisc.io import async_open
@@ -9,6 +10,7 @@ from aiomisc.service.aiohttp import AIOHTTPService
 from aiomisc.service.periodic import PeriodicService
 import ujson
 
+from app.cache import RedisCache, FileCache
 from app.handlers import CalendarView
 from app.schemas import GroupsListSchema, LecturersListSchema
 
@@ -16,14 +18,22 @@ log = logging.getLogger(__name__)
 
 
 class CalendarService(AIOHTTPService):
-    ics_folder: str
+    cache_type: str
+    cache_files_folder: str
+    redis_url: str
 
     async def create_application(self) -> Application:
         app = Application()
-        app["ics_folder"] = self.ics_folder
+        if self.cache_type == "redis":
+            app["cache"] = RedisCache(await aioredis.create_redis(self.redis_url))
+        else:
+            app["cache"] = FileCache(self.cache_files_folder)
         app.add_routes(
             [
-                view(r"/calendar/{type:(group|lecturer)}/{id:\d+}{f:(.ics)?}", CalendarView),
+                view(
+                    r"/calendar/{type:(group|lecturer)}/{id:\d+}{f:(.ics)?}",
+                    CalendarView,
+                ),
             ]
         )
 

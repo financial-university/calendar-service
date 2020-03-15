@@ -26,11 +26,13 @@ class DateField(fields.Field):
 class Pair(Schema):
     @pre_load()
     def pre_load(self, data, many, **kwargs):
-        data["groups"] = (
-            ', '.join((data["group"] or data["stream"] or "-").replace(" ", "").split(","))
+        data["groups"] = ", ".join(
+            (data["group"] or data["stream"] or "-").replace(" ", "").split(",")
         )
         return data
 
+    discipline_id = fields.Integer(data_key="disciplineOid", default=0)
+    stream_id = fields.Integer(data_key="streamOid", default=0)
     time_start = fields.String(data_key="beginLesson")
     time_end = fields.String(data_key="endLesson")
     name = DefaultString(data_key="discipline", default="Без названия")

@@ -1,15 +1,40 @@
-# Use root/example as user/password credentials
 version: '3.1'
 
 services:
-  db:
-    image: mysql
-    command: --default-authentication-plugin=mysql_native_password
-    restart: always
+#  db:
+#    image: mysql
+#    command: --default-authentication-plugin=mysql_native_password
+#    restart: always
+#    expose:
+#      - 3306
+#    ports:
+#      - 3306:3306
+#    environment:
+#      # "root" as username
+#      MYSQL_ROOT_PASSWORD: password
+#      MYSQL_DATABASE: db
+
+  app:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    command: python3 /mnt/start.py
+    volumes:
+      - .:/mnt
+      - ./ics_folder:/mnt/files
+    working_dir: /mnt/
     expose:
-      - 3306
+      - 4040
     ports:
-      - 3306:3306
+      - "4040:4040"
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: db
+      API_FILES_FOLDER: /mnt/files
+      REDIS_URL: redis://redis/0
+
+  redis:
+    image: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    expose:
+      - 6379
+    ports:
+      - 6379:6379
