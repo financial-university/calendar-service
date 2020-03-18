@@ -10,8 +10,9 @@ config = dict(
     files_folder=getenv("API_FILES_FOLDER") or r"c:\\1\\api",
     redis_url=getenv("REDIS_URL") or "redis://localhost/0",
     cache_type="file",
+    docker_run=getenv("DOCKER_RUN") or False
 )
-config["address"] = "0.0.0.0" if not config["debug"] else "localhost"
+config["address"] = "0.0.0.0" if config["docker_run"] else "localhost"
 
 if __name__ == "__main__":
     with entrypoint(

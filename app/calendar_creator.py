@@ -67,7 +67,12 @@ def create_calendar(
         #     log.warning("Error in validation calendar %s %r", url, pair)
         #     continue
         date = datetime.fromtimestamp(pair["date"])
-        note = f'Примечание: {pair["note"]}' if pair["note"] else ""
+        note = f'Примечание: {pair["note"]}\n' if pair["note"] else ""
+        description = f"{pair['type']}\nПреподаватель: {pair['teachers_name']}\nГруппы: {pair['groups']}\n{note}"
+        if pair["url1"]:
+            description += f"{pair['url1_description']}: {pair['url1']}\n"
+        if pair["url2"]:
+            description += f"{pair['url2_description']}: {pair['url2']}\n"
         calendar.add_event(
             IEvent(
                 summary=pair["name"],
@@ -84,7 +89,8 @@ def create_calendar(
                     *map(int, pair["time_end"].split(":")),
                 ),
                 location=f"{pair['audience']}, {pair['location']}",
-                description=f"{pair['type']}\nПреподаватель: {pair['teachers_name']}\nГруппы: {pair['groups']}\n{note}",
+                description=description,
+                url=pair["url1"]
             )
         )
 
