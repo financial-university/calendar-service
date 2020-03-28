@@ -25,14 +25,16 @@ class DateField(fields.Field):
 
 class Pair(Schema):
     @pre_load()
-    def pre_load(self, data, many, **kwargs):
+    def get_groups(self, data: dict, many, **kwargs):
         data["groups"] = ", ".join(
-            (data["group"] or data["stream"] or "-").replace(" ", "").split(",")
+            (data.get("group", None) or data.get("stream", None) or "-")
+            .replace(" ", "")
+            .split(",")
         )
         return data
 
-    discipline_id = fields.Integer(data_key="disciplineOid", default=0)
-    stream_id = fields.Integer(data_key="streamOid", default=0)
+    discipline_id = fields.Integer(data_key="disciplineOid")
+    stream_id = fields.Integer(data_key="streamOid")
     time_start = fields.String(data_key="beginLesson")
     time_end = fields.String(data_key="endLesson")
     name = DefaultString(data_key="discipline", default="Без названия")
@@ -49,6 +51,24 @@ class Pair(Schema):
     url1_description = DefaultString(default="")
     url2 = DefaultString(default="")
     url2_description = DefaultString(default="")
+
+    @post_load()
+    def get_description(self, data: dict, many, **kwargs):
+        note = data["note"] if data["note"] else ""
+        data.pop("note")
+
+        description = f"{data['type']}\nПреподаватель: {data['teachers_name']}\nГруппы: {data['groups']}\n{note}"
+        data.pop("type"), data.pop("teachers_name"), data.pop("groups")
+
+        if data["url1"]:
+            description += f"{data['url1_description']}: {data['url1']}\n"
+        data.pop("url1"), data.pop("url1_description")
+        if data["url2"]:
+            description += f"{data['url2_description']}: {data['url2']}\n"
+        data.pop("url2"), data.pop("url2_description")
+
+        data["description"] = description
+        return data
 
     class Meta:
         unknown = EXCLUDE

@@ -67,12 +67,13 @@ def create_calendar(
         #     log.warning("Error in validation calendar %s %r", url, pair)
         #     continue
         date = datetime.fromtimestamp(pair["date"])
-        note = f'Примечание: {pair["note"]}\n' if pair["note"] else ""
-        description = f"{pair['type']}\nПреподаватель: {pair['teachers_name']}\nГруппы: {pair['groups']}\n{note}"
-        if pair["url1"]:
-            description += f"{pair['url1_description']}: {pair['url1']}\n"
-        if pair["url2"]:
-            description += f"{pair['url2_description']}: {pair['url2']}\n"
+        # note = f'Примечание: {pair["note"]}\n' if pair["note"] else ""
+        # print(pair)
+        # description = f"{pair['type']}\nПреподаватель: {pair['teachers_name']}\nГруппы: {pair['groups']}\n{note}"
+        # if pair["url1"]:
+        #     description += f"{pair['url1_description']}: {pair['url1']}\n"
+        # if pair["url2"]:
+        #     description += f"{pair['url2_description']}: {pair['url2']}\n"
         calendar.add_event(
             IEvent(
                 summary=pair["name"],
@@ -89,8 +90,7 @@ def create_calendar(
                     *map(int, pair["time_end"].split(":")),
                 ),
                 location=f"{pair['audience']}, {pair['location']}",
-                description=description,
-                url=pair["url1"]
+                description=pair["description"],
             )
         )
 
@@ -111,4 +111,5 @@ async def download_calendar_json(id: int, type: str):
         except ClientError:
             raise ServiceUnavailable()
     pairs_list = PAIR_SCHEMA.load(pairs_list, many=True)
+    print(pairs_list)
     return pairs_list

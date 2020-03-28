@@ -14,14 +14,12 @@ class IEvent:
         end: datetime,
         description: str = None,
         location: str = None,
-        url: str = None
     ):
         self.summary = summary
         self.start = start
         self.end = end
         self.description = description
         self.location = location
-        self.url = url
         self.uid = md5(
             (
                 summary
@@ -43,8 +41,6 @@ class IEvent:
         event.add("location", self.location)
         event.add("description", self.description)
         event.add("uid", self.uid)
-        if self.url:
-            event.add("url", self.url)
 
         return event
 

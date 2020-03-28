@@ -19,6 +19,14 @@ class Cache:
         raise NotImplementedError
 
 
+class NoCache(Cache):
+    async def last_update(self, filename: str) -> datetime or None:
+        return None
+
+    async def save(self, filename: str, file: str):
+        pass
+
+
 class RedisCache(Cache):
     def __init__(self, redis: Redis):
         self.redis = redis

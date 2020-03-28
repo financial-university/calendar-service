@@ -1,0 +1,27 @@
+version: '3.1'
+
+services:
+  app:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    command: python3 /mnt/start.py
+    volumes:
+      - .:/mnt
+      - ./ics_folder:/mnt/ics_folder
+    working_dir: /mnt/
+    expose:
+      - 4040
+    ports:
+      - "4040:4040"
+    environment:
+      API_FILES_FOLDER: /mnt/files
+      REDIS_URL: redis://redis/0
+
+  redis:
+    image: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    expose:
+      - 6379
+    ports:
+      - 6379:6379

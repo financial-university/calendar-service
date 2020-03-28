@@ -10,7 +10,7 @@ from aiomisc.service.aiohttp import AIOHTTPService
 from aiomisc.service.periodic import PeriodicService
 import ujson
 
-from app.cache import RedisCache, FileCache
+from app.cache import RedisCache, FileCache, NoCache
 from app.handlers import CalendarView
 from app.schemas import GroupsListSchema, LecturersListSchema
 
@@ -26,8 +26,10 @@ class CalendarService(AIOHTTPService):
         app = Application()
         if self.cache_type == "redis":
             app["cache"] = RedisCache(await aioredis.create_redis(self.redis_url))
-        else:
+        elif self.cache_type == "file":
             app["cache"] = FileCache(self.cache_files_folder)
+        else:
+            app["cache"] = NoCache()
         app.add_routes(
             [
                 view(
@@ -47,7 +49,7 @@ class RuzGrabber(PeriodicService):
     LECTURERS_LIST = LecturersListSchema()
 
     @staticmethod
-    async def get_from_api(client, type: str):
+    async def get_from_api(client: ClientSession, type: str):
         groups = await client.get(f"https://ruz.fa.ru/api/dictionary/{type}")
         return await groups.json()
 

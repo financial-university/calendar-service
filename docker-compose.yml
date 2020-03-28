@@ -1,40 +1,22 @@
 version: '3.1'
 
 services:
-#  db:
-#    image: mysql
-#    command: --default-authentication-plugin=mysql_native_password
-#    restart: always
-#    expose:
-#      - 3306
-#    ports:
-#      - 3306:3306
-#    environment:
-#      # "root" as username
-#      MYSQL_ROOT_PASSWORD: password
-#      MYSQL_DATABASE: db
-
   app:
-    build:
-      dockerfile: Dockerfile
-      context: .
-    command: python3 /mnt/start.py
-    volumes:
-      - .:/mnt
-      - ./ics_folder:/mnt/files
-    working_dir: /mnt/
-    expose:
+    image: docker.pkg.github.com/v1ack/fu-calendar/calendar  # Адрес Docker хранилища
+    command: python3 /mnt/start.py  # Команда запуска
+    expose:  # Открытый порт
       - 4040
     ports:
       - "4040:4040"
-    environment:
+    environment:  # Переменные окружения
       API_FILES_FOLDER: /mnt/files
-      REDIS_URL: redis://redis/0
+      CACHE_TYPE: redis  # Тип кеша (redis, file или no)
+      REDIS_URL: redis://redis/0  # Адрес Redis
 
   redis:
-    image: redis
-    command: ["redis-server", "--appendonly", "yes"]
-    expose:
+    image: redis  # Образ
+    command: ["redis-server", "--appendonly", "yes"]  # Команда запуска
+    expose:  # Порт, если нужен для доступа извне
       - 6379
     ports:
       - 6379:6379
