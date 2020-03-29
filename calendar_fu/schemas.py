@@ -20,7 +20,7 @@ class AudienceField(DefaultString):
 
 class DateField(fields.Field):
     def _deserialize(self, value, attr, data, **kwargs):
-        return datetime.strptime(value, "%Y.%m.%d")
+        return datetime.strptime(value, "%Y.%m.%d").timestamp()
 
 
 class Pair(Schema):

@@ -15,8 +15,9 @@ FROM snakepacker/python:3.7 as app
 COPY --from=builder /usr/share/python3/app /usr/share/python3/app
 
 WORKDIR /mnt/
-ADD app/ /mnt/app/
-ADD start.py/ /mnt/
+ADD calendar_fu /mnt/app/
+#ADD start.py/ /mnt/
 RUN ln -snf /usr/share/python3/app/bin/ /usr/bin/
 ENV PATH="/usr/share/python3/app/bin:${PATH}"
 ENV PYTHONPATH="/mnt/app"
+RUN python -m app

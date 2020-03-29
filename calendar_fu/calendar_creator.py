@@ -5,8 +5,8 @@ from aiohttp import ClientSession, ClientError
 import pytz
 from ujson import loads
 
-from app.cal_lib import ICalendar, IEvent
-from app.schemas import Pair
+from calendar_fu.cal_lib import ICalendar, IEvent
+from calendar_fu.schemas import Pair
 
 log = logging.getLogger(__name__)
 

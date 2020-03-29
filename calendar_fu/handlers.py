@@ -6,8 +6,8 @@ from aiohttp.web_response import Response
 from multidict import MultiDict
 from ujson import loads, dumps
 
-from app.cache import Cache
-from app.calendar_creator import (
+from calendar_fu.cache import Cache
+from calendar_fu.calendar_creator import (
     download_calendar_json,
     EmptySchedule,
     ServiceUnavailable,

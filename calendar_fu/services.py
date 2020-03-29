@@ -10,9 +10,9 @@ from aiomisc.service.aiohttp import AIOHTTPService
 from aiomisc.service.periodic import PeriodicService
 import ujson
 
-from app.cache import RedisCache, FileCache, NoCache
-from app.handlers import CalendarView
-from app.schemas import GroupsListSchema, LecturersListSchema
+from calendar_fu.cache import RedisCache, FileCache, NoCache
+from calendar_fu.handlers import CalendarView
+from calendar_fu.schemas import GroupsListSchema, LecturersListSchema
 
 log = logging.getLogger(__name__)
 

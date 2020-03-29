@@ -2,6 +2,7 @@ aiohttp
 aiomisc
 aiomisc_dependency
 aioredis
+configargparse
 icalendar
 marshmallow
 multidict

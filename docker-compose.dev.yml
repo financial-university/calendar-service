@@ -5,7 +5,7 @@ services:
     build:
       dockerfile: Dockerfile
       context: .
-    command: python3 /mnt/start.py
+#    command: python3 /mnt/start.py
     volumes:
       - .:/mnt
       - ./ics_folder:/mnt/ics_folder
@@ -15,8 +15,8 @@ services:
     ports:
       - "4040:4040"
     environment:
-      API_FILES_FOLDER: /mnt/files
-      REDIS_URL: redis://redis/0
+      APP_API_URL: 0.0.0.0
+      APP_REDIS: redis://redis/0
 
   redis:
     image: redis
