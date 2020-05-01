@@ -1,2 +1,2 @@
 black
-pytest
+pytest~=5.3.5

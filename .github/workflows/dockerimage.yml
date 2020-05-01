@@ -3,9 +3,16 @@ name: Docker Image CI
 on: [push]
 
 jobs:
-
+  test:
+    runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+        - name: test
+          uses: docker://snakepacker/python:all
+          with:
+            args: /bin/bash -c "pip install -U '.[dev]' && pytest -vv tests"
   build:
-
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
 
     steps:

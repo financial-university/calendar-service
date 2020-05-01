@@ -1,4 +1,5 @@
 import socket
+from pathlib import Path
 
 import pytest
 from aiohttp import web
@@ -37,7 +38,7 @@ def rest_url(localhost, rest_port):
 
 @pytest.fixture
 async def rest_service(localhost, rest_port):
-    return CalendarService(address=localhost, port=rest_port, cache_type="no",)
+    return CalendarService(address=localhost, port=rest_port, cache_type="no", )
 
 
 @pytest.fixture
@@ -55,3 +56,8 @@ async def api_client(localhost, rest_port):
         yield client
     finally:
         await client.close()
+
+
+@pytest.fixture()
+def path_test() -> Path:
+    return Path(__file__).parent

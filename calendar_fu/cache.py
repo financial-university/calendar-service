@@ -45,7 +45,7 @@ class RedisCache(Cache):
         await self.redis.set(filename, file, expire=self.ttl)
 
 
-class FileCache:
+class FileCache(Cache):
     def __init__(self, files_path: str):
         self.path = files_path
 

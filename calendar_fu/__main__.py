@@ -30,22 +30,16 @@ group = parser.add_argument_group("Cache")
 group.add_argument("--redis", help="Redis url")
 group.add_argument("--file", action="store_true", help="Flag for local cache")
 
-
-# config = dict(
-#     debug=False,
-#     cache_files_folder=path.join(getcwd(), "ics_folder"),
-#     files_folder=getenv("API_FILES_FOLDER") or r"c:\\1\\api",
-#     redis_url=getenv("REDIS_URL") or "redis://localhost/0",
-#     cache_type=getenv("CACHE_TYPE") or "file",
-#     docker_run=getenv("DOCKER_RUN") or False
-# )
-# config["address"] = "0.0.0.0" if config["docker_run"] else "localhost"
+group = parser.add_argument_group("RUZ files grabber")
+group.add_argument(
+    "--grabber-path", help="Path to store groups and lecturers json", default=None
+)
 
 
 def main():
     arguments = parser.parse_args()
     os.environ.clear()
-    with entrypoint(
+    services = [
         CalendarService(
             address=arguments.api_address,
             port=arguments.api_port,
@@ -54,8 +48,14 @@ def main():
             cache_type=(
                 "redis" if arguments.redis else "file" if arguments.file else "no"
             ),
-        ),
-        RuzGrabber(interval=60 * 60 * 24, files_folder=r"c:\\1\\api"),
+        )
+    ]
+    if arguments.grabber_path:
+        services.append(
+            RuzGrabber(interval=60 * 60 * 24, files_folder=arguments.grabber_path)
+        )
+    with entrypoint(
+        *services,
         debug=arguments.debug,
         log_level=logging.DEBUG if arguments.debug else logging.INFO,
     ) as loop:

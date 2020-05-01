@@ -3,12 +3,12 @@ version: '3.1'
 services:
   app:
     image: docker.pkg.github.com/v1ack/fu-calendar/calendar  # Адрес Docker хранилища
-    command: python3 /mnt/start.py  # Команда запуска
     expose:  # Открытый порт
       - 4040
     ports:
       - "4040:4040"
     environment:  # Переменные окружения
+      APP_API_ADDRESS: 0.0.0.0
       API_FILES_FOLDER: /mnt/files
       CACHE_TYPE: redis  # Тип кеша (redis, file или no)
       REDIS_URL: redis://redis/0  # Адрес Redis
