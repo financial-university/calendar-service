@@ -5,23 +5,23 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v2
-        - name: test
-          uses: docker://snakepacker/python:all
-          with:
-            args: /bin/bash -c "pip install -U '.[dev]' && pytest -vv tests"
+    steps:
+      - uses: actions/checkout@v2
+      - name: test
+        uses: docker://snakepacker/python:all
+        with:
+          args: /bin/bash -c "pip install -U '.[dev]' && pytest -vv tests"
   build:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Build the Docker image
-#       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
-      uses: elgohr/Publish-Docker-Github-Action@master
-      with:
-        name: v1ack/fu-calendar/calendar
-        username: ${{ secrets.DOCKER_GITHUB_USERNAME }}
-        password: ${{ secrets.GH_TOKEN }}
-        registry: docker.pkg.github.com
+      - uses: actions/checkout@v1
+      - name: Build the Docker image
+        #       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: v1ack/fu-calendar/calendar
+          username: ${{ secrets.DOCKER_GITHUB_USERNAME }}
+          password: ${{ secrets.GH_TOKEN }}
+          registry: docker.pkg.github.com
