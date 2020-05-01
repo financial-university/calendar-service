@@ -8,17 +8,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: test
-        uses: docker://snakepacker/python:all
+        uses: docker://python:3.8
         with:
           args: /bin/bash -c "pip install -U '.[dev]' && pytest -vv tests"
   build:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
-
+    needs: test
     steps:
       - uses: actions/checkout@v1
       - name: Build the Docker image
-        #       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+        #run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
           name: v1ack/fu-calendar/calendar
