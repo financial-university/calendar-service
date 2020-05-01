@@ -2,7 +2,7 @@ from pathlib import Path
 
 from ujson import loads
 
-from calendar_creator import create_calendar
+from calendar_fu.calendar_creator import create_calendar
 
 
 async def test_not_ok(api_client):
