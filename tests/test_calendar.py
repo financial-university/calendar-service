@@ -22,7 +22,7 @@ async def test_create_calendar(path_test: Path):
     )
     with (path_test / "test_pairs_data.ical").open("rb") as file:
         expected_data = file.read()
-    assert calendar == expected_data
+    assert calendar.replace(b"\r", b"") == expected_data.replace(b"\r", b"")
 
 
 async def test_all_ok(api_client):
