@@ -2,8 +2,11 @@ from hashlib import md5
 from datetime import datetime
 from typing import List
 
+import pytz
 from icalendar import Event, Calendar, Timezone, TimezoneStandard
 from pytz import BaseTzInfo
+
+UTC = pytz.timezone("UTC")
 
 
 class IEvent:
@@ -23,8 +26,8 @@ class IEvent:
         self.uid = md5(
             (
                 summary
-                + start.isoformat()
-                + end.isoformat()
+                + start.astimezone(UTC).isoformat()
+                + end.astimezone(UTC).isoformat()
                 + (location if location else "")
                 + (description if description else "")
             ).encode()
@@ -41,7 +44,7 @@ class IEvent:
             event.add("dtend", self.end.astimezone(timezone))
         else:
             event.add("dtend", self.end)
-        event.add("dtstamp", self.start)
+        event.add("dtstamp", self.start.astimezone(UTC))
         event.add("location", self.location)
         event.add("description", self.description)
         event.add("uid", self.uid)

@@ -11,6 +11,7 @@ from calendar_fu.schemas import Pair
 log = logging.getLogger(__name__)
 
 DATE_FORMAT = "%Y.%m.%d"
+TIMEZONE = pytz.timezone("Europe/Moscow")
 PAIR_SCHEMA = Pair()
 
 
@@ -52,7 +53,7 @@ def create_calendar(
         color="teal",
         url=url,
         refresh_time="PT4H",
-        timezone=pytz.timezone("Europe/Moscow"),
+        timezone=TIMEZONE,
     )
 
     for pair in rasp:
@@ -82,12 +83,14 @@ def create_calendar(
                     date.month,
                     date.day,
                     *map(int, pair["time_start"].split(":")),
+                    tzinfo=TIMEZONE,
                 ),
                 end=datetime(
                     date.year,
                     date.month,
                     date.day,
                     *map(int, pair["time_end"].split(":")),
+                    tzinfo=TIMEZONE,
                 ),
                 location=f"{pair['audience']}, {pair['location']}",
                 description=pair["description"],
