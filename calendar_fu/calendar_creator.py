@@ -102,7 +102,7 @@ async def download_calendar_json(id: int, type: str):
     async with ClientSession() as client:
         try:
             async with client.get(
-                f"http://ruz.fa.ru/api/schedule/{type}/{id}?start={date_start}&finish={date_end}&lng=1",
+                f"https://ruz.fa.ru/api/schedule/{type}/{id}?start={date_start}&finish={date_end}&lng=1",
                 timeout=20,
             ) as request:
                 pairs_list = await request.json(loads=loads)

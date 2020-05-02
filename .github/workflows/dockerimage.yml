@@ -10,7 +10,7 @@ jobs:
       - name: test
         uses: docker://python:3.8
         with:
-          args: /bin/bash -c "sudo timedatectl set-timezone Europe/Moscow && pip install -U '.[dev]' && pytest -vv tests"
+          args: /bin/bash -c "pip install -U '.[dev]' && pytest -vv tests"
   build:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest

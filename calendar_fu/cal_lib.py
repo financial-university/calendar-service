@@ -35,8 +35,12 @@ class IEvent:
         event.add("summary", self.summary)
         if timezone and not self.start.tzname():
             event.add("dtstart", self.start.astimezone(timezone))
+        else:
+            event.add("dtstart", self.start)
         if timezone and not self.end.tzname():
             event.add("dtend", self.end.astimezone(timezone))
+        else:
+            event.add("dtend", self.end)
         event.add("dtstamp", self.start)
         event.add("location", self.location)
         event.add("description", self.description)
