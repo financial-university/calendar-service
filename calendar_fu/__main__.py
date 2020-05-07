@@ -6,7 +6,7 @@ from os import path
 import configargparse
 from aiomisc import entrypoint
 
-from calendar_fu.services import CalendarService, RuzGrabber
+from calendar_fu.services import CalendarService
 
 parser = configargparse.ArgumentParser(
     allow_abbrev=False,
@@ -30,11 +30,6 @@ group = parser.add_argument_group("Cache")
 group.add_argument("--redis", help="Redis url")
 group.add_argument("--file", action="store_true", help="Flag for local cache")
 
-group = parser.add_argument_group("RUZ files grabber")
-group.add_argument(
-    "--grabber-path", help="Path to store groups and lecturers json", default=None
-)
-
 
 def main():
     arguments = parser.parse_args()
@@ -50,10 +45,6 @@ def main():
             ),
         )
     ]
-    if arguments.grabber_path:
-        services.append(
-            RuzGrabber(interval=60 * 60 * 24, files_folder=arguments.grabber_path)
-        )
     with entrypoint(
         *services,
         debug=arguments.debug,
