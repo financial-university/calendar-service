@@ -6,3 +6,6 @@ build:
 
 run:
     python -m calendar_fu -D --file
+
+install:
+    pip install -r requirements*
