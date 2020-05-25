@@ -1,7 +1,6 @@
 import argparse
 import logging
-import os
-from os import path
+from os import environ, path, getcwd
 
 import configargparse
 from aiomisc import entrypoint
@@ -13,7 +12,7 @@ parser = configargparse.ArgumentParser(
     auto_env_var_prefix="APP_",
     description="iCalendar service for FU RUZ API",
     default_config_files=[
-        os.path.join(os.path.expanduser("~"), ".calendar_fa"),
+        path.join(path.expanduser("~"), ".calendar_fa"),
         "/etc/calendar_fa.conf",
     ],
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -38,12 +37,12 @@ group.add_argument(
 
 def main():
     arguments = parser.parse_args()
-    os.environ.clear()
+    environ.clear()
     services = [
         CalendarService(
             address=arguments.api_address,
             port=arguments.api_port,
-            cache_files_folder=path.join(os.getcwd(), "ics_folder"),
+            cache_files_folder=path.join(getcwd(), "ics_folder"),
             redis_url=arguments.redis,
             cache_type=(
                 "redis" if arguments.redis else "file" if arguments.file else "no"

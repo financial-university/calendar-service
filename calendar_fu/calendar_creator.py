@@ -25,15 +25,20 @@ class ServiceUnavailable(Exception):
 
 def get_dates():
     now = datetime.now()
-    if now.month < 8:
+    if now.month < 5:
         return (
             datetime(now.year, 1, 8).strftime(DATE_FORMAT),
             datetime(now.year, 6, 30).strftime(DATE_FORMAT),
         )
+    elif now.month < 8:
+        return (
+            datetime(now.year, 3, 1).strftime(DATE_FORMAT),
+            datetime(now.year, 7, 30).strftime(DATE_FORMAT),
+        )
     else:
         return (
-            datetime(now.year, 8, 15).strftime(format),
-            datetime(now.year + 1, 1, 31).strftime(format),
+            datetime(now.year, 8, 15).strftime(DATE_FORMAT),
+            datetime(now.year + 1, 1, 31).strftime(DATE_FORMAT),
         )
 
 
@@ -62,19 +67,7 @@ def create_calendar(
         ) != str(pair["stream_id"]):
             continue
 
-        # try:
-        #     pair = PAIR_SCHEMA.load(pair)
-        # except ValidationError:
-        #     log.warning("Error in validation calendar %s %r", url, pair)
-        #     continue
         date = datetime.fromtimestamp(pair["date"])
-        # note = f'Примечание: {pair["note"]}\n' if pair["note"] else ""
-        # print(pair)
-        # description = f"{pair['type']}\nПреподаватель: {pair['teachers_name']}\nГруппы: {pair['groups']}\n{note}"
-        # if pair["url1"]:
-        #     description += f"{pair['url1_description']}: {pair['url1']}\n"
-        # if pair["url2"]:
-        #     description += f"{pair['url2_description']}: {pair['url2']}\n"
         calendar.add_event(
             IEvent(
                 summary=pair["name"],
@@ -111,8 +104,8 @@ async def download_calendar_json(id: int, type: str):
                 pairs_list = await request.json(loads=loads)
                 # if not pairs_list:
                 #     raise EmptySchedule()
-        except ClientError:
+        except ClientError as e:
+            log.warning(e)
             raise ServiceUnavailable()
     pairs_list = PAIR_SCHEMA.load(pairs_list, many=True)
-    print(pairs_list)
     return pairs_list
