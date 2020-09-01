@@ -107,5 +107,9 @@ async def download_calendar_json(id: int, type: str):
         except ClientError as e:
             log.warning(e)
             raise ServiceUnavailable()
-    pairs_list = PAIR_SCHEMA.load(pairs_list, many=True)
+    try:
+        pairs_list = PAIR_SCHEMA.load(pairs_list, many=True)
+    except TypeError as e:
+        log.warning(e)
+        raise ServiceUnavailable()
     return pairs_list
