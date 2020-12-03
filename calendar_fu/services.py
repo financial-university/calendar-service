@@ -33,7 +33,7 @@ class CalendarService(AIOHTTPService):
         app.add_routes(
             [
                 view(
-                    r"/calendar/{type:(group|lecturer)}/{id:\d+}{f:(.ics)?}",
+                    r"/calendar/{type:(group|lecturer|person)}/{id:[\d\w-]+}{f:(.ics)?}",
                     CalendarView,
                 ),
             ]

@@ -39,7 +39,7 @@ def params_handler(query: MultiDict) -> dict:
 class CalendarView(BaseView):
     async def get(self):
         type = self.request.match_info["type"]
-        id = int(self.request.match_info["id"])
+        id = self.request.match_info["id"]
         params = params_handler(self.request.rel_url.query)
         filename = f"{type}_{id}"
         last_update = await self.cache.last_update(filename)

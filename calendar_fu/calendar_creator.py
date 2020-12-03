@@ -93,7 +93,7 @@ def create_calendar(
     return calendar.ical()
 
 
-async def download_calendar_json(id: int, type: str):
+async def download_calendar_json(id: str, type: str):
     date_start, date_end = get_dates()
     async with ClientSession() as client:
         try:
