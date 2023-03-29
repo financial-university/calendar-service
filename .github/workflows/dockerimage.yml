@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v1
       - name: Build the Docker image
         #run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
-        uses: elgohr/Publish-Docker-Github-Action@master
+        uses: elgohr/Publish-Docker-Github-Action@v5
         with:
           name: v1ack/fu-calendar/calendar
           username: ${{ secrets.DOCKER_GITHUB_USERNAME }}
